@@ -14,13 +14,18 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
+    role = db.Column(db.String, default="child")
+    parent_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     assignments = relationship('Assignment', back_populates='user', cascade='all, delete-orphan')
-
+    children = relationship('User', backref=db.backref('parent', remote_side=[id]), lazy=True)
+    
     serialize_rules = (
         '-password_hash',
         '-assignments.user',
+        '-children.parent'
     )
+
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -32,14 +37,17 @@ class User(db.Model, SerializerMixin):
     def validate_username(self, key, value):
         if not value or not value.strip():
             raise ValueError("Username is required.")
-        return value
+        return value.strip()
 
     @validates('email')
     def validate_email(self, key, value):
         if not value or '@' not in value:
             raise ValueError("Valid email required.")
+        value = value.strip().lower()
+        
+        
         existing_user = User.query.filter_by(email=value).first()
-        if existing_user:
+        if existing_user and existing_user.id != self.id:
             raise ValueError("Email already in use.")
         return value
 
@@ -82,3 +90,9 @@ class Chore(db.Model, SerializerMixin):
         if not value or not value.strip():
             raise ValueError('Title cannot be blank.')
         return value
+    
+    
+    
+
+        
+        
