@@ -2,6 +2,7 @@ from flask_restful import Resource
 from models import db, Assignment, User, Chore 
 from flask import request
 from datetime import datetime
+from flask import session
 
 
 class AssignmentList(Resource):
@@ -10,14 +11,26 @@ class AssignmentList(Resource):
         return [assignment.to_dict() for assignment in assignments]
     
     def post(self):
+        parent_id = session.get('user_id')
+        if not parent_id:
+            return{"error": "Unauthorized"}, 401
+        
         data = request.get_json()
 
-        # validate required fields
-        user_id = data.get('user_id')
+        child_id = data.get('user_id')
         chore_id = data.get('chore_id')
 
-        if not user_id or not chore_id:
+        if not child_id or not chore_id:
             return {"error": "user_id and chore_id are required"}, 400
+        
+        # Validate child belongs to parent
+        child = User.query.get(child_id)
+        if not child or child.parent_id != parent_id or child.role != 'child':
+            return {"error": "Invalid child"}, 400
+        
+        chore = Chore.query.get(chore_id)
+        if not chore:
+            return {"error": "Invalid chore"}, 404
         
         due_date_str = data.get('due_date')
         due_date = None
@@ -27,14 +40,8 @@ class AssignmentList(Resource):
             except ValueError:
                 return {"error": "Invalid date format. Use ISO format like '2025-09-30T18:00:00"}, 400
 
-        # optionally validate that User and Chore exist
-        user = User.query.get(user_id)
-        chore = Chore.query.get(chore_id)
-        if not user or not chore:
-            return {"error": "User or Chore not found"}, 404
-
         assignment = Assignment(
-            user_id=user_id,
+            user_id=child_id,
             chore_id=chore_id,
             due_date=due_date,   # depends on your schema
             status=data.get('status', 'assigned')
