@@ -23,7 +23,7 @@ class Signup(Resource):
         db.session.add(user)
         db.session.commit()
         
-        session['parent_id'] = user.id
+        session['user_id'] = user.id
         
         return user.to_dict(), 201
     
@@ -56,7 +56,7 @@ class Login(Resource):
     
 class Logout(Resource):
     def delete(self):
-        session.pop('parent_id', None)
+        session.pop('user_id', None)
         return {'message': 'Logged out'}, 204
     
     

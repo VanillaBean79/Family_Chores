@@ -6,7 +6,7 @@ from models import User, db
 class AddChild(Resource):
     """Allows a parent to add a child account."""
     def post(self):
-        parent_id = session.get('parent_id')
+        parent_id = session.get('user_id')
         if not parent_id:
             return {'error': 'Unauthorized'}, 401
 
@@ -34,9 +34,8 @@ class AddChild(Resource):
 
 
 class Children(Resource):
-    """Returns all children belonging to the logged-in parent."""
     def get(self):
-        parent_id = session.get('parent_id')
+        parent_id = session.get('user_id')  # make sure session key matches login
         if not parent_id:
             return {"error": "Unauthorized"}, 401
 
@@ -49,8 +48,9 @@ class Children(Resource):
         children_data = [
             {
                 "id": child.id,
-                "username": child.username,
-                "role": child.role
+                "username": child.username,         # 🔹 include username
+                "role": child.role,
+                "chore_count": len(child.assignments)  # 🔹 include chore_count
             }
             for child in children
         ]
