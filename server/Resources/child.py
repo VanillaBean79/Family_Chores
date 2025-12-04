@@ -61,7 +61,7 @@ class Children(Resource):
     
 class DeleteChild(Resource):
     def delete(self, child_id):
-        parent_id = session.get("parent_id")
+        parent_id = session.get("user_id")
         if not parent_id:
             return{"error": "Unauthorized."}, 401
         
