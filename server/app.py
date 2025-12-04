@@ -12,7 +12,7 @@ from models import db
 from resources.user import Signup, Login, Logout, CheckSession, UserListResource, UserById
 from resources.chore import ChoreList
 from resources.assignment import AssignmentList, AssignmentById 
-from resources.child import AddChild, Children
+from resources.child import AddChild, Children, DeleteChild
 
 load_dotenv()
 
@@ -54,6 +54,7 @@ def create_app(config_class=DevelopmentConfig):
     # api.add_resource(AddChild, "/add-child")
     api.add_resource(AddChild, "/children/add")
     api.add_resource(Children, '/children/list')
+    api.add_resource(DeleteChild, "/children/delete/<int:child_id>")
     return app
 
 

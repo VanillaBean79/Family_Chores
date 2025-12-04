@@ -56,3 +56,19 @@ class Children(Resource):
         ]
         
         return children_data, 200
+    
+    
+    
+class DeleteChild(Resource):
+    def delete(self, child_id):
+        parent_id = session.get("parent_id")
+        if not parent_id:
+            return{"error": "Unauthorized."}, 401
+        
+        child = User.query.get(child_id)
+        if not child or child.parent_id != parent_id:
+            return {"error": "Child not found or unauthorized"}, 404
+        
+        db.session.delete(child)
+        db.session.commit()
+        return {"message": f"Child {child.username} deleted successfully."}, 200
