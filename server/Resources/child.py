@@ -35,27 +35,22 @@ class AddChild(Resource):
 
 class Children(Resource):
     def get(self):
-        parent_id = session.get('user_id')  # make sure session key matches login
-        if not parent_id:
+        user_id = session.get("user_id")
+        if not user_id:
             return {"error": "Unauthorized"}, 401
 
-        parent = User.query.get(parent_id)
+        parent = User.query.get(user_id)
         if not parent or parent.role != "parent":
             return {"error": "Unauthorized"}, 401
 
-        children = User.query.filter_by(parent_id=parent.id, role="child").all()
-        
-        children_data = [
-            {
-                "id": child.id,
-                "username": child.username,         # 🔹 include username
-                "role": child.role,
-                "chore_count": len(child.assignments)  # 🔹 include chore_count
-            }
-            for child in children
-        ]
-        
-        return children_data, 200
+        children = User.query.filter_by(
+            parent_id=parent.id,
+            role="child"
+        ).all()
+
+        return [child.to_dict() for child in children], 200
+
+
     
     
     
