@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from config import DevelopmentConfig
 from models import db
 from resources.user import Signup, Login, Logout, CheckSession, UserListResource, UserById
-from resources.chore import ChoreList
+from resources.chore import ChoreList, ChoreById
 from resources.assignment import AssignmentList, AssignmentById 
 from resources.child import AddChild, Children, DeleteChild
 
@@ -49,6 +49,7 @@ def create_app(config_class=DevelopmentConfig):
     api.add_resource(UserListResource, '/users')
     api.add_resource(UserById, '/users/<int:id>')
     api.add_resource(ChoreList, '/chores')
+    api.add_resource(ChoreById, "/chores/<int:chore_id>")
     api.add_resource(AssignmentList, '/assignments')
     api.add_resource(AssignmentById, '/assignments/<int:id>')
     # api.add_resource(AddChild, "/add-child")

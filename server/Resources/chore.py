@@ -16,3 +16,14 @@ class ChoreList(Resource):
         db.session.add(chore)
         db.session.commit()
         return chore.to_dict(), 201
+    
+class ChoreById(Resource):
+    def delete(self, chore_id):
+        chore = Chore.query.get(chore_id)
+        if not chore:
+            return {"error": "Chore not found"}, 404
+        
+        db.session.delete(chore)
+        db.session.commit()
+        return {"message": "Chore deleted"}, 200
+        
