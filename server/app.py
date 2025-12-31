@@ -46,7 +46,7 @@ def create_app(config_class=DevelopmentConfig):
     api.add_resource(Signup, '/signup')
     api.add_resource(Login, '/login')
     api.add_resource(Logout, '/logout')
-    api.add_resource(CheckSession, '/me')
+    # api.add_resource(CheckSession, '/me')
     api.add_resource(UserListResource, '/users')
     api.add_resource(UserById, '/users/<int:id>')
     api.add_resource(ChoreList, '/chores')
