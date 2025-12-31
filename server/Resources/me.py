@@ -1,25 +1,16 @@
-# resources/me.py
 from flask_restful import Resource
-from flask import request
+from flask import session
+from models import User
 
 class Me(Resource):
     def get(self):
-        user = getattr(request, "current_user", None)
-        if not user:
+        user_id = session.get("user_id")
+        if not user_id:
             return {"error": "Unauthorized"}, 401
 
-        # Include assignments with chore info
-        user_dict = user.to_dict()
-        user_dict['assignments'] = [
-            {
-                "id": a.id,
-                "status": a.status,
-                "chore": {
-                    "id": a.chore.id,
-                    "title": a.chore.title,
-                    "description": a.chore.description
-                }
-            }
-            for a in user.assignments
-        ]
-        return user_dict, 200
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        # serialize user including assignments with chore and due_date
+        return user.to_dict(), 200
