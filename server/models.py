@@ -92,7 +92,34 @@ class Chore(db.Model, SerializerMixin):
         return value
     
     
+class Notification(db.Model, SerializerMixin):
+    __tablename__ = "notifications"
     
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Who receives the notification (parent)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    
+    # Who completed the chore (child)
+    actor_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    
+    # Related assignment 
+    assignment_id = db.Column(db.Integer, db.ForeignKey("assignments.id"), nullable=True)
+    
+    message = db.Column(db.String, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id])
+    actor = relationship("User", foreign_keys=[actor_id])
+    assignment = relationship("Assignment")
+    
+    serialize_rules = (
+        "-user.assignments",
+        "-actor.assignments",
+        "-assignment.user"
+    )
 
         
         
